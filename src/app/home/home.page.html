@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>L&uuml;becks G&auml;nge</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <main class="page-shell">
+    <section class="intro">
+      <p class="eyebrow">Historische Altstadt</p>
+      <h1>G&auml;nge, H&ouml;fe und Torwege entdecken</h1>
+      <p class="intro-copy">Eine erste &Uuml;bersicht mit {{ eintraege.length || 111 }} Eintr&auml;gen f&uuml;r deine Erkundung zu Fu&szlig;.</p>
+    </section>
+
+    <ion-segment [(ngModel)]="ansicht" class="view-switch" aria-label="Ansicht">
+      <ion-segment-button value="liste"><ion-icon name="list-outline"></ion-icon><ion-label>Liste</ion-label></ion-segment-button>
+      <ion-segment-button value="karte"><ion-icon name="map-outline"></ion-icon><ion-label>Karte</ion-label></ion-segment-button>
+    </ion-segment>
+
+    <section *ngIf="ansicht === 'liste'" class="list-view">
+      <ion-searchbar [(ngModel)]="suchtext" placeholder="Nach Name oder Straße suchen" animated="true"></ion-searchbar>
+      <div class="filters">
+        <ion-select [(ngModel)]="typFilter" interface="popover" label="Typ" label-placement="stacked">
+          <ion-select-option value="Alle">Alle Typen</ion-select-option>
+          <ion-select-option *ngFor="let typ of typen" [value]="typ">{{ typ }}</ion-select-option>
+        </ion-select>
+        <ion-select [(ngModel)]="statusFilter" interface="popover" label="Status" label-placement="stacked">
+          <ion-select-option value="Alle">Alle Status</ion-select-option>
+          <ion-select-option *ngFor="let status of statuswerte" [value]="status">{{ status }}</ion-select-option>
+        </ion-select>
+      </div>
+
+      <p class="result-count" *ngIf="geladen">{{ gefilterteEintraege.length }} Eintr&auml;ge</p>
+      <ion-list lines="full">
+        <ion-item *ngFor="let eintrag of gefilterteEintraege; trackBy: trackById" detail="true">
+          <ion-icon slot="start" [name]="eintrag.typ === 'Hof' ? 'home-outline' : 'walk-outline'"></ion-icon>
+          <ion-label>
+            <h2>{{ eintrag.name }}</h2>
+            <p>{{ eintrag.typ }} &middot; {{ adresse(eintrag) }}</p>
+            <p class="meta">{{ eintrag.status }} &middot; {{ eintrag.zugaenglichkeit }}</p>
+          </ion-label>
+          <ion-badge slot="end" color="success" *ngIf="hatKoordinaten(eintrag)">Karte</ion-badge>
+        </ion-item>
+      </ion-list>
+      <ion-note *ngIf="geladen && !gefilterteEintraege.length" class="empty-state">Keine passenden Eintr&auml;ge gefunden.</ion-note>
+    </section>
+
+    <section *ngIf="ansicht === 'karte'" class="map-view">
+      <div class="map-header"><div><p class="eyebrow">Orientierung</p><h2>Altstadt-Karte</h2></div><ion-button fill="clear" href="https://www.openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap <ion-icon slot="end" name="open-outline"></ion-icon></ion-button></div>
+      <iframe title="Karte der Lübecker Altstadt" src="https://www.openstreetmap.org/export/embed.html?bbox=10.675%2C53.855%2C10.710%2C53.880&amp;layer=mapnik"></iframe>
+      <p class="map-note">Die Kartenansicht ist vorbereitet. Die eigene Fußgängernavigation und die vollständige Verknüpfung der Einträge mit Kartenmarkern folgen als nächster Ausbauschritt.</p>
+    </section>
+  </main>
+</ion-content>
