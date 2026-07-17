@@ -41,6 +41,7 @@ export class HomePage implements AfterViewInit {
   geladen = false;
   language: AppLanguage;
   private map?: L.Map;
+  private markerLayer?: L.LayerGroup;
 
   constructor(
     private readonly http: HttpClient,
@@ -52,6 +53,7 @@ export class HomePage implements AfterViewInit {
       next: (daten) => {
         this.eintraege = daten.eintraege;
         this.geladen = true;
+        this.addMarkers();
       },
       error: () => this.geladen = true,
     });
@@ -93,8 +95,53 @@ export class HomePage implements AfterViewInit {
       maxZoom: 19,
     }).addTo(this.map);
 
+    this.addMarkers();
+
     // Ionic finalizes the content dimensions after the view has been created.
     setTimeout(() => this.map?.invalidateSize(), 150);
+  }
+
+  private addMarkers(): void {
+    if (!this.map) return;
+
+    this.markerLayer?.clearLayers();
+    this.markerLayer ??= L.layerGroup().addTo(this.map);
+
+    this.eintraege
+      .filter((eintrag) => eintrag.koordinaten !== null)
+      .forEach((eintrag) => {
+        const koordinaten = eintrag.koordinaten!;
+        const iconName = eintrag.typ === 'Hof' ? 'home-outline' : 'walk-outline';
+        const markerIcon = L.divIcon({
+          className: 'luebeck-marker-wrapper',
+          html: `<span class="luebeck-marker"><ion-icon name="${iconName}"></ion-icon></span>`,
+          iconSize: [38, 38],
+          iconAnchor: [19, 19],
+          popupAnchor: [0, -22],
+        });
+
+        L.marker([koordinaten.lat, koordinaten.lng], { icon: markerIcon })
+          .bindPopup(this.popupContent(eintrag))
+          .addTo(this.markerLayer!);
+      });
+  }
+
+  private popupContent(eintrag: GaengeEintrag): string {
+    const mapLink = eintrag.kartenlinks.openstreetmap_suche;
+    return `<strong>${this.escapeHtml(eintrag.name)}</strong>`
+      + `<br>${this.escapeHtml(this.adresse(eintrag))}`
+      + `<br><small>${this.escapeHtml(eintrag.status)} · ${this.escapeHtml(eintrag.zugaenglichkeit)}</small>`
+      + `<br><a href="${this.escapeHtml(mapLink)}" target="_blank" rel="noopener">OpenStreetMap öffnen</a>`;
+  }
+
+  private escapeHtml(value: string): string {
+    return value.replace(/[&<>'"]/g, (character) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;',
+    })[character] ?? character);
   }
 
   t(key: string, params: Record<string, string | number> = {}): string {
