@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import * as L from 'leaflet';
+import { Geolocation, Position } from '@capacitor/geolocation';
 import { AppLanguage, TranslationService } from '../core/translation.service';
 
 interface GaengeEintrag {
@@ -40,8 +41,12 @@ export class HomePage implements AfterViewInit {
   ansicht: 'liste' | 'karte' = 'karte';
   geladen = false;
   language: AppLanguage;
+  locationMessage = '';
   private map?: L.Map;
   private markerLayer?: L.LayerGroup;
+  private userLocationMarker?: L.Marker;
+  private locationWatchId?: string;
+  private lastPosition?: Position;
 
   constructor(
     private readonly http: HttpClient,
@@ -68,6 +73,8 @@ export class HomePage implements AfterViewInit {
   onViewChange(): void {
     this.map?.remove();
     this.map = undefined;
+    this.markerLayer = undefined;
+    this.userLocationMarker = undefined;
     if (this.ansicht === 'karte') {
       setTimeout(() => this.initializeMap());
     }
@@ -96,6 +103,13 @@ export class HomePage implements AfterViewInit {
     }).addTo(this.map);
 
     this.addMarkers();
+    if (this.lastPosition) {
+      this.updateUserLocation(this.lastPosition);
+    } else if (this.locationMessage) {
+      this.showFallbackLocation();
+    } else {
+      this.startLocationTracking();
+    }
 
     // Ionic finalizes the content dimensions after the view has been created.
     setTimeout(() => this.map?.invalidateSize(), 150);
@@ -124,6 +138,98 @@ export class HomePage implements AfterViewInit {
           .bindPopup(this.popupContent(eintrag))
           .addTo(this.markerLayer!);
       });
+  }
+
+  async locateUser(): Promise<void> {
+    try {
+      await Geolocation.requestPermissions();
+      const position = await Geolocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 5000,
+      });
+      this.updateUserLocation(position);
+    } catch {
+      this.showFallbackLocation();
+    }
+  }
+
+  private async startLocationTracking(): Promise<void> {
+    if (this.locationWatchId) return;
+
+    await this.locateUser();
+    try {
+      this.locationWatchId = await Geolocation.watchPosition(
+        { enableHighAccuracy: true, maximumAge: 5000 },
+        (position) => {
+          if (position) this.updateUserLocation(position);
+        },
+      );
+    } catch {
+      this.showFallbackLocation();
+    }
+  }
+
+  private updateUserLocation(position: Position): void {
+    this.lastPosition = position;
+    if (!this.map) return;
+
+    const actualLocation = L.latLng(position.coords.latitude, position.coords.longitude);
+    const isInsideAltstadt = actualLocation.lat >= 53.852
+      && actualLocation.lat <= 53.884
+      && actualLocation.lng >= 10.666
+      && actualLocation.lng <= 10.716;
+    const displayLocation = isInsideAltstadt
+      ? actualLocation
+      : L.latLng(53.8688, 10.6697);
+
+    this.locationMessage = isInsideAltstadt ? '' : this.t('locationFallback');
+    this.setDisplayedLocation(
+      displayLocation,
+      this.locationPopup(isInsideAltstadt),
+      isInsideAltstadt ? 17 : 14,
+    );
+  }
+
+  private showFallbackLocation(): void {
+    const fallbackLocation = L.latLng(53.8688, 10.6697);
+    this.locationMessage = this.t('locationFallbackUnavailable');
+    this.setDisplayedLocation(
+      fallbackLocation,
+      `<strong>${this.escapeHtml(this.t('locationFallbackTitle'))}</strong><br>${this.escapeHtml(this.t('locationFallbackUnavailable'))}`,
+      14,
+    );
+  }
+
+  private setDisplayedLocation(location: L.LatLng, popup: string, zoom: number): void {
+    if (!this.map) return;
+
+    const locationIcon = L.divIcon({
+      className: 'user-location-wrapper',
+      html: '<span class="user-location-marker"><ion-icon name="locate-outline"></ion-icon></span>',
+      iconSize: [42, 42],
+      iconAnchor: [21, 21],
+    });
+
+    if (this.userLocationMarker) {
+      this.userLocationMarker.setLatLng(location);
+      this.userLocationMarker.setPopupContent(popup);
+      this.map.setView(location, zoom);
+      return;
+    }
+
+    this.userLocationMarker = L.marker(location, {
+      icon: locationIcon,
+      zIndexOffset: 1000,
+    }).addTo(this.map);
+    this.userLocationMarker.bindPopup(popup);
+    this.map.setView(location, zoom);
+  }
+
+  private locationPopup(isInsideAltstadt: boolean): string {
+    return isInsideAltstadt
+      ? `<strong>${this.escapeHtml(this.t('yourLocation'))}</strong>`
+      : `<strong>${this.escapeHtml(this.t('locationFallbackTitle'))}</strong><br>${this.escapeHtml(this.t('locationFallback'))}`;
   }
 
   private popupContent(eintrag: GaengeEintrag): string {
