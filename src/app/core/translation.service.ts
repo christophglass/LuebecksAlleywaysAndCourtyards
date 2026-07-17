@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 
@@ -7,11 +7,12 @@ type TranslationDictionary = Record<string, string>;
 
 @Injectable({ providedIn: 'root' })
 export class TranslationService {
+  private readonly http = inject(HttpClient);
   readonly supportedLanguages: AppLanguage[] = ['de', 'en'];
   readonly language$ = new BehaviorSubject<AppLanguage>(this.initialLanguage());
   private dictionary: TranslationDictionary = {};
 
-  constructor(private readonly http: HttpClient) {
+  constructor() {
     this.load(this.language$.value);
   }
 

@@ -19,5 +19,11 @@
   "openStreetMap": "OpenStreetMap",
   "mapTitle": "Map of Lübeck's old town",
   "mapNote": "The map view is prepared. Dedicated pedestrian navigation and complete map markers will be added in the next development step.",
-  "language": "Language"
+  "language": "Language",
+  "locate": "My location",
+  "yourLocation": "Your current location",
+  "locationUnavailable": "Your location could not be determined. Please allow location access.",
+  "locationFallbackUnavailable": "Your location could not be determined. The map is showing Lübeck Central Station as a fallback.",
+  "locationFallbackTitle": "Location outside the old town",
+  "locationFallback": "The map is showing Lübeck Central Station as a fallback."
 }

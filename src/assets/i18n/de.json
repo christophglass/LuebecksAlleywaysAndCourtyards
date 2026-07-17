@@ -19,5 +19,11 @@
   "openStreetMap": "OpenStreetMap",
   "mapTitle": "Karte der Lübecker Altstadt",
   "mapNote": "Die Kartenansicht ist vorbereitet. Die eigene Fußgängernavigation und die vollständige Verknüpfung der Einträge mit Kartenmarkern folgen als nächster Ausbauschritt.",
-  "language": "Sprache"
+  "language": "Sprache",
+  "locate": "Mein Standort",
+  "yourLocation": "Dein aktueller Standort",
+  "locationUnavailable": "Der Standort konnte nicht ermittelt werden. Bitte erlaube den Zugriff auf den Standort.",
+  "locationFallbackUnavailable": "Der Standort konnte nicht ermittelt werden. Die Karte zeigt ersatzweise den Lübecker Hauptbahnhof.",
+  "locationFallbackTitle": "Standort außerhalb der Altstadt",
+  "locationFallback": "Die Kartenansicht zeigt ersatzweise den Lübecker Hauptbahnhof."
 }
