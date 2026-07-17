@@ -16,7 +16,7 @@
       <p class="intro-copy">{{ t('introCopy', { count: eintraege.length || 111 }) }}</p>
     </section>
 
-    <ion-segment [(ngModel)]="ansicht" class="view-switch" [attr.aria-label]="t('viewLabel')">
+    <ion-segment [(ngModel)]="ansicht" (ngModelChange)="onViewChange()" class="view-switch" [attr.aria-label]="t('viewLabel')">
       <ion-segment-button value="liste"><ion-icon name="list-outline"></ion-icon><ion-label>{{ t('list') }}</ion-label></ion-segment-button>
       <ion-segment-button value="karte"><ion-icon name="map-outline"></ion-icon><ion-label>{{ t('map') }}</ion-label></ion-segment-button>
     </ion-segment>
@@ -51,7 +51,7 @@
 
     <section *ngIf="ansicht === 'karte'" class="map-view">
       <div class="map-header"><div><p class="eyebrow">{{ t('orientation') }}</p><h2>{{ t('oldTownMap') }}</h2></div><ion-button fill="clear" href="https://www.openstreetmap.org" target="_blank" rel="noopener">{{ t('openStreetMap') }} <ion-icon slot="end" name="open-outline"></ion-icon></ion-button></div>
-      <iframe [title]="t('mapTitle')" src="https://www.openstreetmap.org/export/embed.html?bbox=10.675%2C53.855%2C10.710%2C53.880&amp;layer=mapnik"></iframe>
+      <div #mapElement class="map-canvas" [attr.aria-label]="t('mapTitle')" role="application"></div>
       <p class="map-note">{{ t('mapNote') }}</p>
     </section>
   </main>

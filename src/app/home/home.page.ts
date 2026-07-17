@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import * as L from 'leaflet';
 import { AppLanguage, TranslationService } from '../core/translation.service';
 
 interface GaengeEintrag {
@@ -29,14 +30,17 @@ interface GaengeDaten {
   styleUrls: ['home.page.scss'],
   standalone: false,
 })
-export class HomePage {
+export class HomePage implements AfterViewInit {
+  @ViewChild('mapElement') mapElement?: ElementRef<HTMLElement>;
+
   eintraege: GaengeEintrag[] = [];
   suchtext = '';
   typFilter = 'Alle';
   statusFilter = 'Alle';
-  ansicht: 'liste' | 'karte' = 'liste';
+  ansicht: 'liste' | 'karte' = 'karte';
   geladen = false;
   language: AppLanguage;
+  private map?: L.Map;
 
   constructor(
     private readonly http: HttpClient,
@@ -51,6 +55,46 @@ export class HomePage {
       },
       error: () => this.geladen = true,
     });
+  }
+
+  ngAfterViewInit(): void {
+    if (this.ansicht === 'karte') {
+      this.initializeMap();
+    }
+  }
+
+  onViewChange(): void {
+    this.map?.remove();
+    this.map = undefined;
+    if (this.ansicht === 'karte') {
+      setTimeout(() => this.initializeMap());
+    }
+  }
+
+  private initializeMap(): void {
+    const element = this.mapElement?.nativeElement;
+    if (!element || this.map) return;
+
+    const altstadtBounds = L.latLngBounds(
+      [53.852, 10.666],
+      [53.884, 10.716],
+    );
+
+    this.map = L.map(element, {
+      minZoom: 14,
+      maxZoom: 19,
+      maxBounds: altstadtBounds,
+      maxBoundsViscosity: 1,
+      zoomControl: true,
+    }).setView([53.868, 10.694], 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19,
+    }).addTo(this.map);
+
+    // Ionic finalizes the content dimensions after the view has been created.
+    setTimeout(() => this.map?.invalidateSize(), 150);
   }
 
   t(key: string, params: Record<string, string | number> = {}): string {
