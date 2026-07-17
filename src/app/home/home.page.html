@@ -1,36 +1,40 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>L&uuml;becks G&auml;nge</ion-title>
+    <ion-title>{{ t('appTitle') }}</ion-title>
+    <ion-select class="language-select" [value]="language" [attr.aria-label]="t('language')" (ionChange)="setLanguage($event.detail.value)">
+      <ion-select-option value="de">DE</ion-select-option>
+      <ion-select-option value="en">EN</ion-select-option>
+    </ion-select>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <main class="page-shell">
     <section class="intro">
-      <p class="eyebrow">Historische Altstadt</p>
-      <h1>G&auml;nge, H&ouml;fe und Torwege entdecken</h1>
-      <p class="intro-copy">Eine erste &Uuml;bersicht mit {{ eintraege.length || 111 }} Eintr&auml;gen f&uuml;r deine Erkundung zu Fu&szlig;.</p>
+      <p class="eyebrow">{{ t('eyebrowHistory') }}</p>
+      <h1>{{ t('introTitle') }}</h1>
+      <p class="intro-copy">{{ t('introCopy', { count: eintraege.length || 111 }) }}</p>
     </section>
 
-    <ion-segment [(ngModel)]="ansicht" class="view-switch" aria-label="Ansicht">
-      <ion-segment-button value="liste"><ion-icon name="list-outline"></ion-icon><ion-label>Liste</ion-label></ion-segment-button>
-      <ion-segment-button value="karte"><ion-icon name="map-outline"></ion-icon><ion-label>Karte</ion-label></ion-segment-button>
+    <ion-segment [(ngModel)]="ansicht" class="view-switch" [attr.aria-label]="t('viewLabel')">
+      <ion-segment-button value="liste"><ion-icon name="list-outline"></ion-icon><ion-label>{{ t('list') }}</ion-label></ion-segment-button>
+      <ion-segment-button value="karte"><ion-icon name="map-outline"></ion-icon><ion-label>{{ t('map') }}</ion-label></ion-segment-button>
     </ion-segment>
 
     <section *ngIf="ansicht === 'liste'" class="list-view">
-      <ion-searchbar [(ngModel)]="suchtext" placeholder="Nach Name oder Straße suchen" animated="true"></ion-searchbar>
+      <ion-searchbar [(ngModel)]="suchtext" [placeholder]="t('searchPlaceholder')" animated="true"></ion-searchbar>
       <div class="filters">
-        <ion-select [(ngModel)]="typFilter" interface="popover" label="Typ" label-placement="stacked">
-          <ion-select-option value="Alle">Alle Typen</ion-select-option>
+        <ion-select [(ngModel)]="typFilter" interface="popover" [label]="t('type')" label-placement="stacked">
+          <ion-select-option value="Alle">{{ t('allTypes') }}</ion-select-option>
           <ion-select-option *ngFor="let typ of typen" [value]="typ">{{ typ }}</ion-select-option>
         </ion-select>
-        <ion-select [(ngModel)]="statusFilter" interface="popover" label="Status" label-placement="stacked">
-          <ion-select-option value="Alle">Alle Status</ion-select-option>
+        <ion-select [(ngModel)]="statusFilter" interface="popover" [label]="t('status')" label-placement="stacked">
+          <ion-select-option value="Alle">{{ t('allStatuses') }}</ion-select-option>
           <ion-select-option *ngFor="let status of statuswerte" [value]="status">{{ status }}</ion-select-option>
         </ion-select>
       </div>
 
-      <p class="result-count" *ngIf="geladen">{{ gefilterteEintraege.length }} Eintr&auml;ge</p>
+      <p class="result-count" *ngIf="geladen">{{ t('resultCount', { count: gefilterteEintraege.length }) }}</p>
       <ion-list lines="full">
         <ion-item *ngFor="let eintrag of gefilterteEintraege; trackBy: trackById" detail="true">
           <ion-icon slot="start" [name]="eintrag.typ === 'Hof' ? 'home-outline' : 'walk-outline'"></ion-icon>
@@ -39,16 +43,16 @@
             <p>{{ eintrag.typ }} &middot; {{ adresse(eintrag) }}</p>
             <p class="meta">{{ eintrag.status }} &middot; {{ eintrag.zugaenglichkeit }}</p>
           </ion-label>
-          <ion-badge slot="end" color="success" *ngIf="hatKoordinaten(eintrag)">Karte</ion-badge>
+          <ion-badge slot="end" color="success" *ngIf="hatKoordinaten(eintrag)">{{ t('mapAvailable') }}</ion-badge>
         </ion-item>
       </ion-list>
-      <ion-note *ngIf="geladen && !gefilterteEintraege.length" class="empty-state">Keine passenden Eintr&auml;ge gefunden.</ion-note>
+      <ion-note *ngIf="geladen && !gefilterteEintraege.length" class="empty-state">{{ t('noResults') }}</ion-note>
     </section>
 
     <section *ngIf="ansicht === 'karte'" class="map-view">
-      <div class="map-header"><div><p class="eyebrow">Orientierung</p><h2>Altstadt-Karte</h2></div><ion-button fill="clear" href="https://www.openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap <ion-icon slot="end" name="open-outline"></ion-icon></ion-button></div>
-      <iframe title="Karte der Lübecker Altstadt" src="https://www.openstreetmap.org/export/embed.html?bbox=10.675%2C53.855%2C10.710%2C53.880&amp;layer=mapnik"></iframe>
-      <p class="map-note">Die Kartenansicht ist vorbereitet. Die eigene Fußgängernavigation und die vollständige Verknüpfung der Einträge mit Kartenmarkern folgen als nächster Ausbauschritt.</p>
+      <div class="map-header"><div><p class="eyebrow">{{ t('orientation') }}</p><h2>{{ t('oldTownMap') }}</h2></div><ion-button fill="clear" href="https://www.openstreetmap.org" target="_blank" rel="noopener">{{ t('openStreetMap') }} <ion-icon slot="end" name="open-outline"></ion-icon></ion-button></div>
+      <iframe [title]="t('mapTitle')" src="https://www.openstreetmap.org/export/embed.html?bbox=10.675%2C53.855%2C10.710%2C53.880&amp;layer=mapnik"></iframe>
+      <p class="map-note">{{ t('mapNote') }}</p>
     </section>
   </main>
 </ion-content>

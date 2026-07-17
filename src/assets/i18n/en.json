@@ -1,0 +1,23 @@
+{
+  "appTitle": "Lübeck's Alleys",
+  "eyebrowHistory": "Historic old town",
+  "introTitle": "Discover alleys, courtyards and passageways",
+  "introCopy": "An initial overview of {count} places to explore on foot.",
+  "list": "List",
+  "map": "Map",
+  "viewLabel": "View",
+  "searchPlaceholder": "Search by name or street",
+  "type": "Type",
+  "allTypes": "All types",
+  "status": "Status",
+  "allStatuses": "All statuses",
+  "resultCount": "{count} entries",
+  "mapAvailable": "Map",
+  "noResults": "No matching entries found.",
+  "orientation": "Orientation",
+  "oldTownMap": "Old town map",
+  "openStreetMap": "OpenStreetMap",
+  "mapTitle": "Map of Lübeck's old town",
+  "mapNote": "The map view is prepared. Dedicated pedestrian navigation and complete map markers will be added in the next development step.",
+  "language": "Language"
+}

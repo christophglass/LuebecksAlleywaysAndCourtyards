@@ -1,5 +1,7 @@
 # Luebecks Gaenge und Hoefe
 
+Die Oberflaeche unterstuetzt Deutsch und Englisch. Die Uebersetzungen liegen in `src/assets/i18n/de.json` und `src/assets/i18n/en.json`.
+
 Ionic-Angular-App fuer die Gänge, Höfe und Torwege der Lübecker Altstadt.
 
 ## Entwicklung

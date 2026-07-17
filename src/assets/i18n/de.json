@@ -1,0 +1,23 @@
+{
+  "appTitle": "Lübecks Gänge",
+  "eyebrowHistory": "Historische Altstadt",
+  "introTitle": "Gänge, Höfe und Torwege entdecken",
+  "introCopy": "Eine erste Übersicht mit {count} Einträgen für deine Erkundung zu Fuß.",
+  "list": "Liste",
+  "map": "Karte",
+  "viewLabel": "Ansicht",
+  "searchPlaceholder": "Nach Name oder Straße suchen",
+  "type": "Typ",
+  "allTypes": "Alle Typen",
+  "status": "Status",
+  "allStatuses": "Alle Status",
+  "resultCount": "{count} Einträge",
+  "mapAvailable": "Karte",
+  "noResults": "Keine passenden Einträge gefunden.",
+  "orientation": "Orientierung",
+  "oldTownMap": "Altstadt-Karte",
+  "openStreetMap": "OpenStreetMap",
+  "mapTitle": "Karte der Lübecker Altstadt",
+  "mapNote": "Die Kartenansicht ist vorbereitet. Die eigene Fußgängernavigation und die vollständige Verknüpfung der Einträge mit Kartenmarkern folgen als nächster Ausbauschritt.",
+  "language": "Sprache"
+}

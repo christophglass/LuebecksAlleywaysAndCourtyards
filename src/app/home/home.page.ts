@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { AppLanguage, TranslationService } from '../core/translation.service';
 
 interface GaengeEintrag {
   id: string;
@@ -35,8 +36,14 @@ export class HomePage {
   statusFilter = 'Alle';
   ansicht: 'liste' | 'karte' = 'liste';
   geladen = false;
+  language: AppLanguage;
 
-  constructor(private readonly http: HttpClient) {
+  constructor(
+    private readonly http: HttpClient,
+    private readonly translations: TranslationService,
+  ) {
+    this.language = translations.currentLanguage;
+    this.translations.language$.subscribe((language) => this.language = language);
     this.http.get<GaengeDaten>('assets/data/gaenge_und_hoefe_luebeck.json').subscribe({
       next: (daten) => {
         this.eintraege = daten.eintraege;
@@ -44,6 +51,14 @@ export class HomePage {
       },
       error: () => this.geladen = true,
     });
+  }
+
+  t(key: string, params: Record<string, string | number> = {}): string {
+    return this.translations.translate(key, params);
+  }
+
+  setLanguage(language: AppLanguage): void {
+    this.translations.setLanguage(language);
   }
 
   get gefilterteEintraege(): GaengeEintrag[] {
