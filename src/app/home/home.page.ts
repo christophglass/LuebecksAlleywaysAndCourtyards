@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import * as L from 'leaflet';
 import { Geolocation, Position } from '@capacitor/geolocation';
@@ -33,6 +33,8 @@ interface GaengeDaten {
 })
 export class HomePage implements AfterViewInit {
   @ViewChild('mapElement') mapElement?: ElementRef<HTMLElement>;
+  private readonly http = inject(HttpClient);
+  private readonly translations = inject(TranslationService);
 
   eintraege: GaengeEintrag[] = [];
   suchtext = '';
@@ -48,11 +50,8 @@ export class HomePage implements AfterViewInit {
   private locationWatchId?: string;
   private lastPosition?: Position;
 
-  constructor(
-    private readonly http: HttpClient,
-    private readonly translations: TranslationService,
-  ) {
-    this.language = translations.currentLanguage;
+  constructor() {
+    this.language = this.translations.currentLanguage;
     this.translations.language$.subscribe((language) => this.language = language);
     this.http.get<GaengeDaten>('assets/data/gaenge_und_hoefe_luebeck.json').subscribe({
       next: (daten) => {
